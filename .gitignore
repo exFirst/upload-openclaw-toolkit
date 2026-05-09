@@ -1,4 +1,4 @@
-# Personal workspace files — ignored to keep this repo clean
+# Personal workspace files — not for public repos
 /AGENTS.md
 /SOUL.md
 /IDENTITY.md
@@ -6,22 +6,7 @@
 /MEMORY.md
 /HEARTBEAT.md
 /TOOLS.md
-/CHECK.md
 /memory/
 /state/
 /.openclaw/
 /__pycache__/
-
-# State & logs
-/.openrouter_*
-/openrouter_*.log
-/openrouter_*.sh
-
-# Config / keys
-/.openrouter_key
-/.secrets.env
-
-# Temp / audio
-*.wav
-*.ogg
-test_tone.wav
