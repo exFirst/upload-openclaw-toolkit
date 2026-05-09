@@ -1,0 +1,28 @@
+# Personal / identity
+AGENTS.md
+SOUL.md
+IDENTITY.md
+USER.md
+MEMORY.md
+memory/
+HEARTBEAT.md
+
+# State and logs
+.openrouter_balance_state
+.openrouter_watch_state
+openrouter_alarm.log
+openrouter_watch.log
+
+# API keys
+.openrouter_key
+TOOLS.md
+
+# OpenClaw internal
+.openclaw/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Audio test files
+test_tone.wav
