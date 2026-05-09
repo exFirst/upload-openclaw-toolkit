@@ -14,20 +14,18 @@ Full docs: [zipline.diced.sh](https://zipline.diced.sh)
 
 Zipline and OpenClaw complement each other perfectly. Here's everything the combo enables:
 
-| Scenario | How It Works |
-|----------|-------------|
-| **📎 Upload files on demand** | OpenClaw uploads reports, screenshots, audio files to Zipline via API — returns a shareable link |
-| **🔗 Shorten long URLs** | OpenClaw sends a long URL → Zipline returns a short link ready to paste anywhere |
-| **📸 Screenshot → link** | ShareX auto-uploads screenshots to Zipline → OpenClaw picks up the link for reports |
-| **🔒 Share private files** | OpenClaw uploads with password protection — only recipients with the password can view |
-| **⏳ Temp links with expiry** | OpenClaw sets `Max-Age` or `Max-Views` — files self-destruct after time or views |
-| **🖼️ Host images & embeds** | Upload images/video/audio → rich embeds in Discord, Telegram, anywhere |
-| **📊 State & backups** | OpenClaw stores JSON state files or backup archives on Zipline |
-| **🤖 Webhooks & alerts** | Zipline sends Discord/HTTP webhooks on upload → OpenClaw can listen and react |
-| **📁 User file management** | OpenClaw lists, tags, folders, deletes files on Zipline through the API |
-| **🔐 Auto-register users** | OpenClaw creates invite codes or manages Zipline user registration |
-| **🌐 Vanity short links** | OpenClaw shortens URLs with custom slugs — `go/offer-page` instead of random gibberish |
-| **📈 Metrics monitoring** | OpenClaw reads Zipline's Prometheus metrics endpoint for dashboards |
+- **📎 Upload files on demand** — OpenClaw uploads reports, screenshots, audio files to Zipline via API, returns a shareable link
+- **🔗 Shorten long URLs** — OpenClaw sends a long URL, Zipline returns a short link ready to paste anywhere
+- **📸 Screenshot → link** — ShareX auto-uploads screenshots to Zipline, OpenClaw picks up the link for reports
+- **🔒 Share private files** — OpenClaw uploads with password protection, only recipients with the password can view
+- **⏳ Temp links with expiry** — OpenClaw sets `Max-Age` or `Max-Views`, files self-destruct after time or views
+- **🖼️ Host images & embeds** — Upload images/video/audio, rich embeds in Discord, Telegram, anywhere
+- **📊 State & backups** — OpenClaw stores JSON state files or backup archives on Zipline
+- **🤖 Webhooks & alerts** — Zipline sends Discord/HTTP webhooks on upload, OpenClaw can listen and react
+- **📁 User file management** — OpenClaw lists, tags, folders, deletes files on Zipline through the API
+- **🔐 Auto-register users** — OpenClaw creates invite codes or manages Zipline user registration
+- **🌐 Vanity short links** — OpenClaw shortens URLs with custom slugs like `go/offer-page` instead of random gibberish
+- **📈 Metrics monitoring** — OpenClaw reads Zipline's Prometheus metrics endpoint for dashboards
 
 ### Practical examples
 
@@ -140,13 +138,11 @@ Set up ShareX to auto-upload screenshots to your server:
 1. ShareX → **Destinations** → **Custom uploader settings...**
 2. Create new uploader:
 
-| Setting | Value |
-|---------|-------|
-| Method | `POST` |
-| URL | `https://your-zipline.com/api/user/files` |
-| Body | `Form data (multipart)` |
-| File form name | `file` |
-| Header | `Authorization: YOUR_TOKEN` |
+- **Method:** `POST`
+- **URL:** `https://your-zipline.com/api/user/files`
+- **Body:** `Form data (multipart)`
+- **File form name:** `file`
+- **Header:** `Authorization: YOUR_TOKEN`
 
 3. **Response parsing:**
    - URL: `$json:url$`
@@ -300,11 +296,9 @@ FEATURES_THUMBNAILS_ENABLED=true
 
 ### Storage options
 
-| Type | Best for | Setup |
-|------|----------|-------|
-| **Local** | Single server, small files | Just set `DATASOURCE_LOCAL_DIRECTORY` |
-| **S3 / Cloudflare R2** | Scalable, backups, multiple servers | Set 5 env vars (type, key, secret, bucket, region) |
-| **Backblaze B2** | Cheapest S3-compatible | Same as S3 with custom endpoint |
+- **Local** — single server, small files. Just set `DATASOURCE_LOCAL_DIRECTORY`
+- **S3 / Cloudflare R2** — scalable, backups, multiple servers. Set 5 env vars (type, key, secret, bucket, region)
+- **Backblaze B2** — cheapest S3-compatible. Same as S3 with custom endpoint
 
 ---
 
