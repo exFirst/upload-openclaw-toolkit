@@ -10,6 +10,95 @@ Full docs: [zipline.diced.sh](https://zipline.diced.sh)
 
 ---
 
+## 🔗 Zipline + OpenClaw: What You Can Do
+
+Zipline and OpenClaw complement each other perfectly. Here's everything the combo enables:
+
+| Scenario | How It Works |
+|----------|-------------|
+| **📎 Upload files on demand** | OpenClaw uploads reports, screenshots, audio files to Zipline via API — returns a shareable link |
+| **🔗 Shorten long URLs** | OpenClaw sends a long URL → Zipline returns a short link ready to paste anywhere |
+| **📸 Screenshot → link** | ShareX auto-uploads screenshots to Zipline → OpenClaw picks up the link for reports |
+| **🔒 Share private files** | OpenClaw uploads with password protection — only recipients with the password can view |
+| **⏳ Temp links with expiry** | OpenClaw sets `Max-Age` or `Max-Views` — files self-destruct after time or views |
+| **🖼️ Host images & embeds** | Upload images/video/audio → rich embeds in Discord, Telegram, anywhere |
+| **📊 State & backups** | OpenClaw stores JSON state files or backup archives on Zipline |
+| **🤖 Webhooks & alerts** | Zipline sends Discord/HTTP webhooks on upload → OpenClaw can listen and react |
+| **📁 User file management** | OpenClaw lists, tags, folders, deletes files on Zipline through the API |
+| **🔐 Auto-register users** | OpenClaw creates invite codes or manages Zipline user registration |
+| **🌐 Vanity short links** | OpenClaw shortens URLs with custom slugs — `go/offer-page` instead of random gibberish |
+| **📈 Metrics monitoring** | OpenClaw reads Zipline's Prometheus metrics endpoint for dashboards |
+
+### Practical examples
+
+```bash
+# OpenClaw uploads a daily report → shareable link
+curl -X POST https://zipline.example.com/api/user/files \
+  -H "Authorization: TOKEN" \
+  -F "file=@daily-report.pdf"
+
+# OpenClaw shortens a tracking URL → vanity link
+curl -X POST https://zipline.example.com/api/user/urls \
+  -H "Authorization: TOKEN" \
+  -d '{"destination": "...", "vanity": "track-order"}'
+
+# OpenClaw uploads a password-protected file → secure share
+curl -X POST https://zipline.example.com/api/user/files \
+  -H "Authorization: TOKEN" \
+  -H "X-Zipline-Password: secret123" \
+  -F "file=@private.pdf"
+
+# OpenClaw creates a link that expires after 10 views
+curl -X POST https://zipline.example.com/api/user/urls \
+  -H "Authorization: TOKEN" \
+  -d '{"destination": "https://...", "maxViews": 10}'
+
+# OpenClaw lists all uploaded files
+curl -X GET https://zipline.example.com/api/user/files \
+  -H "Authorization: TOKEN"
+
+# OpenClaw deletes an old file
+curl -X DELETE https://zipline.example.com/api/user/files/FILE_ID \
+  -H "Authorization: TOKEN"
+```
+
+### OpenClaw tool config
+
+Add Zipline as a tool in your OpenClaw configuration:
+
+```yaml
+tools:
+  zipline_upload:
+    description: "Upload a file to Zipline and return the shareable URL"
+    api:
+      kind: "url"
+      url: "https://zipline.example.com/api/user/files"
+      method: "POST"
+      headers:
+        Authorization: "YOUR_TOKEN"
+      body:
+        kind: "form-data"
+        fields:
+          file: "$FILE"
+
+  zipline_shorten:
+    description: "Shorten a URL using Zipline"
+    api:
+      kind: "url"
+      url: "https://zipline.example.com/api/user/urls"
+      method: "POST"
+      headers:
+        Authorization: "YOUR_TOKEN"
+        Content-Type: "application/json"
+      body:
+        kind: "json"
+        fields:
+          destination: "$URL"
+          vanity: "$VANITY"
+```
+
+---
+
 ## 🎯 Quick Start (5 minutes)
 
 ```bash
@@ -34,48 +123,8 @@ Create an admin account. Done ✅
 
 ---
 
-## 🔗 Integrate with OpenClaw
-
-Zipline gives OpenClaw the ability to **upload files and shorten URLs** via API.
-
-### Upload a file from OpenClaw
-
-```bash
-# Using curl in an OpenClaw action
-curl -X POST https://your-zipline.com/api/user/files \
-  -H "Authorization: YOUR_TOKEN" \
-  -F "file=@report.pdf"
-# Returns: {"url": "https://zipline.example.com/u/abc123"}
-```
-
-### Shorten a URL from OpenClaw
-
-```bash
-curl -X POST https://your-zipline.com/api/user/urls \
-  -H "Authorization: YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"destination": "https://very-long-url.com/page"}'
-# Returns: {"url": "https://zipline.example.com/go/abc123"}
-```
-
-### Auto-upload screenshots
-
-Combine with ShareX → every screenshot → auto-uploaded → URL in clipboard.  
-(See [ShareX setup below](#-sharex-integration).)
-
-### OpenClaw tool example
-
-```yaml
-# In your OpenClaw tool config
-tools:
-  zipline_upload:
-    description: "Upload a file to Zipline"
-    api:
-      kind: "url"
-      url: "https://your-zipline.com/api/user/files"
-      headers:
-        Authorization: "YOUR_TOKEN"
-```
+> **Screenshot workflow:** ShareX → Zipline → link in clipboard.  
+> Combine with OpenClaw for auto-reports. See [ShareX setup below](#-sharex-integration).
 
 ---
 
