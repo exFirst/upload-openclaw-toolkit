@@ -101,18 +101,23 @@ tools:
 
 ## 🎯 Quick Start (5 minutes)
 
+**Option A — Clone this repo** (includes config files and scripts):
+
 ```bash
-# 1. Create a folder
+git clone https://github.com/exFirst/upload-openclaw-toolkit.git ~/zipline
+cd ~/zipline
+cp .env.example .env
+# Edit .env — replace secrets
+docker compose up -d
+```
+
+**Option B — From scratch:**
+
+```bash
 mkdir ~/zipline && cd ~/zipline
-
-# 2. Download the setup
 curl -LO https://zipline.diced.sh/docker-compose.yml
-
-# 3. Generate passwords
 echo "POSTGRESQL_PASSWORD=$(openssl rand -base64 42 | tr -dc A-Za-z0-9 | cut -c -32)" > .env
 echo "CORE_SECRET=$(openssl rand -base64 42 | tr -dc A-Za-z0-9 | cut -c -32)" >> .env
-
-# 4. Run!
 docker compose up -d
 ```
 
@@ -319,22 +324,16 @@ tar -czf uploads-$(date +%Y%m%d).tar.gz ~/zipline/uploads/
 
 ### Auto-backup script (cron)
 
-Save as `~/zipline/backup.sh`:
+The repo includes [backup.sh](backup.sh) — ready to use:
 
 ```bash
-#!/bin/bash
-DIR="$HOME/zipline-backups"
-mkdir -p "$DIR/{db,files}"
+# Make executable and test
+chmod +x backup.sh
+./backup.sh
 
-docker compose exec -T postgresql pg_dump -U zipline zipline | gzip > "$DIR/db/db-$(date +%Y%m%d).sql.gz"
-tar -czf "$DIR/files/uploads-$(date +%Y%m%d).tar.gz" -C ~/zipline uploads/
-
-# Keep 30 days
-find "$DIR" -name "*.gz" -mtime +30 -delete
-```
-
-Add to crontab (`crontab -e`):
-```cron
+# Add to crontab (daily at 3 AM)
+crontab -e
+# Add:
 0 3 * * * ~/zipline/backup.sh
 ```
 
@@ -342,8 +341,10 @@ Add to crontab (`crontab -e`):
 ```bash
 docker compose down -v
 docker compose up -d postgresql
-docker compose exec -T postgresql psql -U zipline -d zipline < backup.sql
-tar -xzf uploads-backup.tar.gz -C ~/zipline/
+docker compose exec -T postgresql psql -U zipline -d zipline < zipline-db-20250101.sql  # use a specific backup file
+# OR for gzipped backups:
+gunzip -c zipline-db-20250101.sql.gz | docker compose exec -T postgresql psql -U zipline -d zipline
+tar -xzf zipline-uploads-20250101.tar.gz -C ~/zipline/
 docker compose up -d
 ```
 
@@ -413,53 +414,6 @@ docker compose up -d
 Migrations run automatically.
 
 ---
-
-## 📋 Full docker-compose.yml
-
-```yaml
-services:
-  postgresql:
-    image: postgres:16
-    restart: unless-stopped
-    env_file:
-      - .env
-    environment:
-      POSTGRES_USER: ${POSTGRESQL_USER:-zipline}
-      POSTGRES_PASSWORD: ${POST…WORD is required}
-      POSTGRES_DB: ${POSTGRESQL_DB:-zipline}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'zipline']
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  zipline:
-    image: ghcr.io/diced/zipline:latest
-    restart: unless-stopped
-    ports:
-      - '3000:3000'
-    env_file:
-      - .env
-    environment:
-      - DATABASE_URL=postgres://${POSTGRESQL_USER:-zipline}:${POSTGRESQL_PASSWORD}@postgresql:5432/${POSTGRESQL_DB:-zipline}
-    depends_on:
-      postgresql:
-        condition: service_healthy
-    volumes:
-      - './uploads:/zipline/uploads'
-      - './public:/zipline/public'
-      - './themes:/zipline/themes'
-    healthcheck:
-      test: ['CMD', 'wget', '-q', '--spider', 'http://0.0.0.0:3000/api/healthcheck']
-      interval: 15s
-      timeout: 2s
-      retries: 2
-
-volumes:
-  pgdata:
-```
 
 ---
 

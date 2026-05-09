@@ -6,10 +6,13 @@
 set -e
 
 BACKUP_DIR="$HOME/zipline-backups"
+ZIPLINE_DIR="$HOME/zipline"
 DATE=$(date +%Y%m%d-%H%M%S)
 RETENTION_DAYS=30
 
-mkdir -p "$BACKUP_DIR/{db,files}"
+# Must run from the zipline directory
+cd "$ZIPLINE_DIR" 2>/dev/null || { echo "❌ Zipline directory not found at $ZIPLINE_DIR"; exit 1; }
+mkdir -p "$BACKUP_DIR/db" "$BACKUP_DIR/files"
 
 echo "=== Zipline Backup: $DATE ==="
 
