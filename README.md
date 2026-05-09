@@ -29,35 +29,46 @@ Zipline and OpenClaw complement each other perfectly. Here's everything the comb
 
 ### Practical examples
 
+First, save your session cookie from login:
+
 ```bash
-# OpenClaw uploads a daily report → shareable link
-curl -X POST https://zipline.example.com/api/user/files \
-  -H "Authorization: TOKEN" \
+# Login and save the session cookie
+curl -c ~/.zipline-cookie -X POST https://zipline.example.com/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"YourPass"}'
+```
+
+Then use the cookie for all API calls:
+
+```bash
+# Upload a file → shareable link
+curl -b ~/.zipline-cookie -X POST https://zipline.example.com/api/upload \
   -F "file=@daily-report.pdf"
 
-# OpenClaw shortens a tracking URL → vanity link
-curl -X POST https://zipline.example.com/api/user/urls \
-  -H "Authorization: TOKEN" \
-  -d '{"destination": "...", "vanity": "track-order"}'
+# Shorten a URL → short link
+curl -b ~/.zipline-cookie -X POST https://zipline.example.com/api/user/urls \
+  -H "Content-Type: application/json" \
+  -d '{"destination": "https://long-url.com/page"}'
 
-# OpenClaw uploads a password-protected file → secure share
-curl -X POST https://zipline.example.com/api/user/files \
-  -H "Authorization: TOKEN" \
-  -H "X-Zipline-Password: secret123" \
-  -F "file=@private.pdf"
+# Upload with password protection
+curl -b ~/.zipline-cookie -X POST https://zipline.example.com/api/upload \
+  -F "file=@private.pdf" \
+  -F "password=secret123"
 
-# OpenClaw creates a link that expires after 10 views
-curl -X POST https://zipline.example.com/api/user/urls \
-  -H "Authorization: TOKEN" \
+# Upload with auto-expiry (7 days)
+curl -b ~/.zipline-cookie -X POST https://zipline.example.com/api/upload \
+  -F "file=@temp.pdf" \
+  -F "maxAge=7d"
+
+# Create a vanity URL
+curl -b ~/.zipline-cookie -X POST https://zipline.example.com/api/user/urls \
+  -H "Content-Type: application/json" \
+  -d '{"destination": "https://...", "vanity": "my-link"}'
+
+# Create a URL with max views (auto-disable after 10 clicks)
+curl -b ~/.zipline-cookie -X POST https://zipline.example.com/api/user/urls \
+  -H "Content-Type: application/json" \
   -d '{"destination": "https://...", "maxViews": 10}'
-
-# OpenClaw lists all uploaded files
-curl -X GET https://zipline.example.com/api/user/files \
-  -H "Authorization: TOKEN"
-
-# OpenClaw deletes an old file
-curl -X DELETE https://zipline.example.com/api/user/files/FILE_ID \
-  -H "Authorization: TOKEN"
 ```
 
 ### OpenClaw tool config
@@ -70,10 +81,8 @@ tools:
     description: "Upload a file to Zipline and return the shareable URL"
     api:
       kind: "url"
-      url: "https://zipline.example.com/api/user/files"
+      url: "https://zipline.example.com/api/upload"
       method: "POST"
-      headers:
-        Authorization: "YOUR_TOKEN"
       body:
         kind: "form-data"
         fields:
@@ -86,7 +95,6 @@ tools:
       url: "https://zipline.example.com/api/user/urls"
       method: "POST"
       headers:
-        Authorization: "YOUR_TOKEN"
         Content-Type: "application/json"
       body:
         kind: "json"
@@ -122,6 +130,18 @@ docker compose up -d
 Open `http://your-server:3000` — you'll see a setup page.  
 Create an admin account. Done ✅
 
+### Automated setup (no browser needed)
+
+The repo includes [setup.sh](setup.sh) — creates admin user right from the terminal:
+
+```bash
+./setup.sh
+# Or with custom credentials:
+ADMIN_USER=myadmin ADMIN_PASS=MyStr0ngPass! ./setup.sh
+```
+
+The script waits for Zipline to start, creates the admin account, and prints the login info.
+
 > **Hardware note:** Zipline needs a CPU with AVX support. Most modern Intel/AMD CPUs have it.
 
 ---
@@ -139,10 +159,12 @@ Set up ShareX to auto-upload screenshots to your server:
 2. Create new uploader:
 
 - **Method:** `POST`
-- **URL:** `https://your-zipline.com/api/user/files`
+- **URL:** `https://your-zipline.com/api/upload`
 - **Body:** `Form data (multipart)`
 - **File form name:** `file`
-- **Header:** `Authorization: YOUR_TOKEN`
+
+> **Auth note:** For ShareX, generate an API token in Dashboard → Settings → User → Copy Token.  
+> Add the header: `Authorization: YOUR_TOKEN`
 
 3. **Response parsing:**
    - URL: `$json:url$`
@@ -193,26 +215,26 @@ Drag & drop files. Get a link. Share it.
 
 ### Upload via API
 ```bash
-curl -X POST https://zipline.example.com/api/user/files \
-  -H "Authorization: YOUR_TOKEN" \
+curl -b ~/.zipline-cookie -X POST https://zipline.example.com/api/upload \
   -F "file=@photo.jpg"
 ```
 
 ### Password-protected files
 ```bash
-curl -X POST ... \
-  -H "Authorization: YOUR_TOKEN" \
-  -H "X-Zipline-Password: secret123" \
-  -F "file=@private.pdf"
+curl -b ~/.zipline-cookie -X POST https://zipline.example.com/api/upload \
+  -F "file=@private.pdf" \
+  -F "password=secret123"
 ```
 
 ### Auto-expire files
 ```bash
 # Delete after 7 days
-curl -X POST ... -H "X-Zipline-Max-Age: 7d"
+curl -b ~/.zipline-cookie -X POST https://zipline.example.com/api/upload \
+  -F "file=@temp.pdf" -F "maxAge=7d"
 
 # Delete after 5 views
-curl -X POST ... -H "X-Zipline-Max-Views: 5"
+curl -b ~/.zipline-cookie -X POST https://zipline.example.com/api/upload \
+  -F "file=@temp.pdf" -F "maxViews=5"
 ```
 
 ---
