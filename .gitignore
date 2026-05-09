@@ -1,28 +1,27 @@
-# Personal / identity
-AGENTS.md
-SOUL.md
-IDENTITY.md
-USER.md
-MEMORY.md
-memory/
-HEARTBEAT.md
+# Personal workspace files — ignored to keep this repo clean
+/AGENTS.md
+/SOUL.md
+/IDENTITY.md
+/USER.md
+/MEMORY.md
+/HEARTBEAT.md
+/TOOLS.md
+/CHECK.md
+/memory/
+/state/
+/.openclaw/
+/__pycache__/
 
-# State and logs
-.openrouter_balance_state
-.openrouter_watch_state
-openrouter_alarm.log
-openrouter_watch.log
+# State & logs
+/.openrouter_*
+/openrouter_*.log
+/openrouter_*.sh
 
-# API keys
-.openrouter_key
-TOOLS.md
+# Config / keys
+/.openrouter_key
+/.secrets.env
 
-# OpenClaw internal
-.openclaw/
-
-# Python cache
-__pycache__/
-*.pyc
-
-# Audio test files
+# Temp / audio
+*.wav
+*.ogg
 test_tone.wav
