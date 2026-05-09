@@ -409,8 +409,6 @@ Migrations run automatically.
 
 ---
 
----
-
 ## 🙏 Acknowledgments
 
 - **[diced](https://github.com/diced)** — built and maintains Zipline. The entire project, docs, Docker images, regular updates.
